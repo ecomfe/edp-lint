@@ -5,10 +5,12 @@
     "contributors": [
         { "name": "errorrik", "email": "errorrik@gmail.com" },
         { "name": "firede", "email" : "firede@firede.us" },
-        { "name": "chris", "email" : "wfsr@foxmail.com" }
+        { "name": "chris", "email" : "wfsr@foxmail.com" },
+        { "name": "otakustay", "email" : "otakustay@live.com" }
     ],
     "dependencies": {
         "csslint": "~0.10.0",
+        "jshint": "~2.4.4",
         "edp-core": "~1.0.5"
     },
     "repository": "git://github.com/ecomfe/edp-lint",
