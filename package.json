@@ -1,0 +1,16 @@
+{
+    "name": "edp-lint",
+    "description": "Package for edp code detect",
+    "version": "0.4.11",
+    "contributors": [
+        { "name": "errorrik", "email": "errorrik@gmail.com" },
+        { "name": "firede", "email" : "firede@firede.us" },
+        { "name": "chris", "email" : "wfsr@foxmail.com" }
+    ],
+    "dependencies": {
+        "csslint": "~0.10.0",
+        "edp-core": "~1.0.5"
+    },
+    "repository": "git://github.com/ecomfe/edp-lint",
+    "scripts": {}
+}
