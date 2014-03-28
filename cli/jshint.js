@@ -52,6 +52,14 @@ function readDir( dir, startDir, conf, result ) {
 }
 
 /**
+ * 只考虑项目或者package根目录下面的东东.
+ * @const
+ */
+var IGNORE_PATTERNS = require( '../lib/util' ).getIgnorePatterns(
+    path.resolve( process.cwd(), '.jshintignore' )
+);
+
+/**
  * 检测Javascript文件
  * 
  * @inner
@@ -61,6 +69,15 @@ function readDir( dir, startDir, conf, result ) {
  * @param {Array} result 结果保存数组
  */
 function detectJS( file, startDir, conf, result ) {
+    var isIgnored = edp.glob.match(
+        path.relative( process.cwd(), file ),
+        IGNORE_PATTERNS
+    );
+
+    if ( isIgnored ) {
+        return;
+    }
+
     conf = edp.util.extend(
         require( '../lib/js/config' ), conf);
 

@@ -3,7 +3,7 @@
  * @author chris[wfsr@foxmail.com]
  */
 
-
+var edp = require( 'edp-core' );
 var fs = require( 'fs' );
 var path = require( 'path' );
 
@@ -51,6 +51,14 @@ function readDir( dir, startDir, conf, result ) {
 }
 
 /**
+ * 只考虑项目或者package根目录下面的东东.
+ * @const
+ */
+var IGNORE_PATTERNS = require( '../lib/util' ).getIgnorePatterns(
+    path.resolve( process.cwd(), '.htmlhintignore' )
+);
+
+/**
  * 检测HTML文件
  * 
  * @inner
@@ -60,6 +68,15 @@ function readDir( dir, startDir, conf, result ) {
  * @param {Array} result 结果保存数组
  */
 function detectHTML( file, startDir, conf, result ) {
+    var isIgnored = edp.glob.match(
+        path.relative( process.cwd(), file ),
+        IGNORE_PATTERNS
+    );
+
+    if ( isIgnored ) {
+        return;
+    }
+
     conf = conf || require( '../lib/html/config' );
 
     var data = {};
