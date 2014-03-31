@@ -4,146 +4,46 @@
  */
 
 var edp = require( 'edp-core' );
-
 var fs = require( 'fs' );
-var path = require( 'path' );
 
 /**
- * 读取目录
- * 
- * @inner
- * @param {string} dir 目录路径
- * @param {string=} startDir 开始目录路径
- * @param {Object=} conf 验证配置
- * @param {Array} result 结果保存数组
+ * @param {Array.<string>} candidates 所有需要检查的文件.
+ * @return {Object} 检查的结果.
  */
-function readDir( dir, startDir, conf, result ) {
-    startDir = startDir || dir;
-    var files = fs.readdirSync( dir );
+function detect( candidates ){
+    var invalidFiles = [];
 
-    // 读取当前目录下的'.jshintrc'配置文件
-    var jshintRcFile = dir + '/.jshintrc';
-    if ( fs.existsSync( jshintRcFile ) ) {
-        var rcBuffer = fs.readFileSync( jshintRcFile );
-        conf = JSON.parse( rcBuffer.toString( 'UTF-8' ) );
+    var util = require( '../lib/util' );
+    candidates.forEach(function( item ){
+        if ( util.isIgnored( item ) ) {
+            return;
+        }
+
+        var defaultConfig = require( '../lib/js/config' );
+        var jshintConfig = util.getConfig( '.jshintrc', item, defaultConfig );
+
+        var jshint = require( 'jshint' ).JSHINT;
+        var source = fs.readFileSync( item, 'utf-8' );
+        var success = jshint( source, jshintConfig );
+
+        function dump( err, idx ) {
+            if ( !err ){ return; }
+            edp.log.warn( '→ line %s, col %s: %s',
+                err.line, err.character, err.reason );
+        }
+
+        if ( !success ) {
+            invalidFiles.push( item );
+            edp.log.info( item );
+            jshint.errors.forEach( dump );
+            console.log();
+            ok = false;
+        }
+    });
+
+    if ( !invalidFiles.length ) {
+        edp.log.info( 'All is well :-)' );
     }
-
-    // 扫瞄文件与文件夹
-    for ( var i = 0, len = files.length; i < len; i++ ) {
-        var file = files[ i ];
-        var filename = dir + '/' + file;
-
-        // 忽略隐藏文件
-        if ( /^\./.test( file ) ) {
-            continue;
-        }
-
-        var fsStat = fs.statSync( filename );
-        if ( fsStat.isDirectory() && file != 'node_modules' ) {
-            readDir( filename, startDir, conf, result );
-        }
-        else if (
-            fsStat.isFile()
-            && path.extname( file ).toLowerCase() == '.js'
-        ) {
-            detectJS( filename, startDir, conf, result );
-        }
-    }
-}
-
-/**
- * 只考虑项目或者package根目录下面的东东.
- * @const
- */
-var IGNORE_PATTERNS = require( '../lib/util' ).getIgnorePatterns(
-    path.resolve( process.cwd(), '.jshintignore' )
-);
-
-/**
- * 检测Javascript文件
- * 
- * @inner
- * @param {string} file 文件路径
- * @param {string=} startDir 开始目录路径
- * @param {Object=} conf 验证配置
- * @param {Array} result 结果保存数组
- */
-function detectJS( file, startDir, conf, result ) {
-    var isIgnored = edp.glob.match(
-        path.relative( process.cwd(), file ),
-        IGNORE_PATTERNS
-    );
-
-    if ( isIgnored ) {
-        return;
-    }
-
-    conf = edp.util.extend(
-        require( '../lib/js/config' ), conf);
-
-    var data = {};
-    result.push( data );
-    data.file = path.relative( startDir, file );
-
-    var jshint = require( 'jshint' ).JSHINT;
-    var source = fs.readFileSync( file );
-
-    data.success = jshint( source.toString( 'UTF-8' ), conf );
-    if ( !data.success ) {
-        data.errors = jshint.errors;
-        data.data = jshint.data();
-    }
-}
-
-/**
- * 显示检测结果报告
- * 
- * @inner
- * @param {Array.<Object>} result 检测结果数组
- */
-function report( result ) {
-    var count = result.length;
-    var errorFileCount = 0;
-    var errorCount = 0;
-
-    result.forEach( function ( data ) {
-        if ( !data.success ) {
-            errorFileCount++;
-            errorCount += data.errors.length;
-            consoleTitle( data.file );
-
-            data.errors.forEach( function ( err, idx ) {
-                if ( !err ) {
-                    return;
-                }
-
-                console.log( (idx + 1) + '. line ' + err.line + ', col ' +
-                    err.character + ': ' + err.reason );
-            } );
-            console.log( '\n' );
-        }
-    } );
-
-    consoleTitle( 'Total' );
-    console.log( 'Detect ' + count + ' files, find ' 
-        + errorCount + ' errors in ' + errorFileCount + ' files.\n' );
-    result.forEach( function ( data ) {
-        if ( !data.success ) {
-            console.log( '- ' + data.file );
-        }
-    } );
-    console.log( '\n' );
-}
-
-/**
- * console.log标题
- * 
- * @inner
- * @param {string} title 标题描述
- */
-function consoleTitle( title ) {
-    console.log( title );
-    console.log( '---------------\n' );
 }
 
 /**
@@ -166,41 +66,38 @@ cli.description = '使用jshint检测当前目录下所有Javascript文件。';
  *
  * @param {Array.<string>} args
  */
-cli.main = function (args) {
-    var result = [];
+cli.main = function ( args ) {
+    var candidates = [];
 
-    if ( args.length ) {
-        var globalConfig = null;
-        if (fs.existsSync(path.resolve(process.cwd(), '.jshintrc'))) {
-            globalConfig = JSON.parse(fs.readFileSync(
-                path.resolve(process.cwd(), '.jshintrc'), 'UTF-8'));
-        }
+    if ( !args.length ) {
+        candidates = edp.glob.sync([
+            '**/*.js', '!**/output/**',
+            '!**/test/**', '!**/node_modules/**'
+        ]);
+    }
+    else {
+        for( var i = 0; i < args.length; i ++ ) {
+            var target = args[ i ];
+            if ( !fs.existsSync( target ) ) {
+                edp.log.warn( 'No such file or directory %s', target );
+                continue;
+            }
 
-        for (var i = 0; i < args.length; i ++) {
-            var target = args[i];
-            if (target) {
-                if (!fs.existsSync(target)) {
-                    console.error('No such file or directory = [' +
-                        target + ']');
-                    process.exit(1);
-                }
-                else {
-                    var fsStat = fs.statSync(target);
-                    if (fsStat.isDirectory()) {
-                        readDir(target, null, null, result);
-                    }
-                    else {
-                        detectJS(target, path.dirname(target),
-                            globalConfig, result);
-                    }
-                }
+            var stat = fs.statSync( target );
+            if ( stat.isDirectory() ) {
+                target = target.replace( /[\/|\\]+$/, '' );
+                candidates.push.apply(
+                    candidates, edp.glob.sync( target + '/**/*.js' ) );
+            }
+            else if ( stat.isFile() ) {
+                candidates.push( target );
             }
         }
     }
-    else {
-        readDir( process.cwd(), null, null, result );
+
+    if ( candidates.length ) {
+        detect( candidates );
     }
-    report( result );
 };
 
 /**
