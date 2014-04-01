@@ -5,7 +5,6 @@
 
 var edp = require( 'edp-core' );
 var fs = require( 'fs' );
-var path = require( 'path' );
 
 // 目前 csslint 项目正在考虑配置文件格式改 json 的问题：
 // https://github.com/stubbornella/csslint/issues/359
@@ -95,33 +94,12 @@ cli.description = '使用csslint检测当前目录下所有CSS文件。';
  * @param {Object} opts
  */
 cli.main = function ( args, opts ) {
-    var candidates = [];
-
-    if ( !args.length ) {
-        candidates = edp.glob.sync([
-            '**/*.css', '!**/output/**',
-            '!**/test/**', '!**/node_modules/**'
-        ]);
-    }
-    else {
-        for( var i = 0; i < args.length; i ++ ) {
-            var target = args[ i ];
-            if ( !fs.existsSync( target ) ) {
-                edp.log.warn( 'No such file or directory %s', target );
-                continue;
-            }
-
-            var stat = fs.statSync( target );
-            if ( stat.isDirectory() ) {
-                target = target.replace( /[\/|\\]+$/, '' );
-                candidates.push.apply(
-                    candidates, edp.glob.sync( target + '/**/*.css' ) );
-            }
-            else if ( stat.isFile() ) {
-                candidates.push( target );
-            }
-        }
-    }
+    var patterns = [
+        '**/*.css', '!**/output/**',
+        '!**/test/**', '!**/node_modules/**'
+    ];
+    var candidates = require( '../lib/util' ).getCandidates(
+        args, patterns );
 
     if ( candidates.length ) {
         detect( candidates );

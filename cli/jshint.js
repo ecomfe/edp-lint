@@ -67,33 +67,12 @@ cli.description = '使用jshint检测当前目录下所有Javascript文件。';
  * @param {Array.<string>} args
  */
 cli.main = function ( args ) {
-    var candidates = [];
-
-    if ( !args.length ) {
-        candidates = edp.glob.sync([
-            '**/*.js', '!**/output/**',
-            '!**/test/**', '!**/node_modules/**'
-        ]);
-    }
-    else {
-        for( var i = 0; i < args.length; i ++ ) {
-            var target = args[ i ];
-            if ( !fs.existsSync( target ) ) {
-                edp.log.warn( 'No such file or directory %s', target );
-                continue;
-            }
-
-            var stat = fs.statSync( target );
-            if ( stat.isDirectory() ) {
-                target = target.replace( /[\/|\\]+$/, '' );
-                candidates.push.apply(
-                    candidates, edp.glob.sync( target + '/**/*.js' ) );
-            }
-            else if ( stat.isFile() ) {
-                candidates.push( target );
-            }
-        }
-    }
+    var patterns = [
+        '**/*.js', '!**/output/**',
+        '!**/test/**', '!**/node_modules/**'
+    ];
+    var candidates = require( '../lib/util' ).getCandidates(
+        args, patterns );
 
     if ( candidates.length ) {
         detect( candidates );
