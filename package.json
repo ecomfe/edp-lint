@@ -1,7 +1,7 @@
 {
     "name": "edp-lint",
     "description": "Package for edp code detect",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "contributors": [
         { "name": "errorrik", "email": "errorrik@gmail.com" },
         { "name": "firede", "email" : "firede@firede.us" },
