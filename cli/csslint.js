@@ -21,192 +21,56 @@ var path = require( 'path' );
 //  }
 
 /**
- * 读取目录
- * 
- * @inner
- * @param {string} dir 目录路径
- * @param {string=} startDir 开始目录路径
- * @param {Object=} conf 验证配置
- * @param {Array} result 结果保存数组
- */
-function readDir( dir, startDir, conf, result ) {
-    startDir = startDir || dir;
-    var files = fs.readdirSync( dir );
-
-    // 读取当前目录下的'.csslintrc'配置文件
-    var csslintRcFile = path.resolve( dir, '.csslintrc' );
-    if ( fs.existsSync( csslintRcFile ) ) {
-        var rcText = fs.readFileSync( csslintRcFile, 'UTF-8' );
-        try {
-            var conf = JSON.parse( rcText );
-        }
-        catch (e) {
-            console.error(
-                '`.csslintrc` syntax error, see `edp help csslint`.'
-            );
-            process.exit( 1 );
-        }
-    }
-
-    // 扫瞄文件与文件夹
-    for ( var i = 0, len = files.length; i < len; i++ ) {
-        var file = files[ i ];
-        var filename = dir + '/' + file;
-
-        // 忽略隐藏文件
-        if ( /^\./.test( file ) ) {
-            continue;
-        }
-
-        var fsStat = fs.statSync( filename );
-        if ( fsStat.isDirectory() && file != 'node_modules' ) {
-            readDir( filename, startDir, conf, result );
-        }
-        else if ( 
-            fsStat.isFile() 
-            && path.extname( file ).toLowerCase() == '.css'
-        ) {
-            detectCSS( filename, startDir, conf, result );
-        }
-    }
-}
-
-/**
- * 只考虑项目或者package根目录下面的东东.
- * @const
- */
-var IGNORE_PATTERNS = require( '../lib/util' ).getIgnorePatterns(
-    path.resolve( process.cwd(), '.csslintignore' )
-);
-
-/**
- * 检测CSS文件
- * 
- * @inner
- * @param {string} file 文件路径
- * @param {string=} startDir 开始目录路径
- * @param {Object=} conf 验证配置
- * @param {Array} result 结果保存数组
- */
-function detectCSS( file, startDir, conf, result ) {
-    var isIgnored = edp.glob.match(
-        path.relative( process.cwd(), file ),
-        IGNORE_PATTERNS
-    );
-
-    if ( isIgnored ) {
-        return;
-    }
-
-    conf = conf || require( '../lib/css/config' );
-
-    var data = {};
-    result.push( data );
-    data.file = path.relative( startDir, file );
-
-    var csslint = require( 'csslint' ).CSSLint;
-    var source = fs.readFileSync( file, 'UTF-8' );
-    
-    var defaultConf = csslint.getRuleset();
-    conf = edp.util.extend( defaultConf, conf );
-
-    if ( source.trim() === '' ) {
-        data.success = {
-            messages: [
-                {
-                    type: 'error',
-                    message: 'File is empty.'
-                }
-            ]
-        };
-    } else {
-        data.success = csslint.verify( source, conf );
-    }
-}
-
-/**
- * 显示检测结果报告
- * 
- * @inner
- * @param {Array.<Object>} result 检测结果数组
- */
-function report( result ) {
-    var fileCount = result.length;
-    var errorCount = 0;
-    var warningCount = 0;
-    var failFileCount = 0;
-
-    console.log( edp.util.colorize( 'CSS Lint Result', 'title' ) );
-    console.log( edp.util.colorize( '===', 'info' ) );
-
-    result.forEach( function( item ) {
-        if (item.success) {
-            var messages = item.success.messages || [];
-            if ( messages.length > 0 ) {
-                failFileCount++;
-
-                outputTitle( item.file );
-                messages.forEach(function( message ) {
-                    ( message.type === 'warning' ) && warningCount++;
-                    ( message.type === 'error' ) && errorCount++;
-
-                    outputMessage( message );
-                });
-            }
-        }
-    });
-
-    outputTitle( 'Total' );
-    console.log(
-        'Detect ' + fileCount + ' files.',
-        'find ' + errorCount + ' errors',
-        'and ' + warningCount + ' warnings',
-        'in ' + failFileCount + ' files.\n'
-    );
-}
-
-/**
  * 输出单条检测信息
  * 
  * @inner
  * @param {Object} message 检测信息对象
  */
 function outputMessage( message ) {
-    var position = '';
-    var failInfo = message.type.toUpperCase();
-
+    var msg = '→ ';
     // 全局性的错误可能没有位置信息
     if ( message.line && message.col ) {
-        position = edp.util.colorize(
-            '[L' + message.line + ',C' + message.col + '] ',
-            'info'
-        );
+        msg += require( 'util' ).format( 'line %s, col %s: ',
+            message.line, message.col );
     }
-
-    // 如果有符合的规则，加入失败信息中
-    if ( message.rule && message.rule.name ) {
-        failInfo += ': ' + message.rule.name;
-    }
-
-    console.log( position + edp.util.colorize( failInfo, message.type ) );
-    console.log( 'Message:', message.message );
-    if ( message.evidence ) {
-        if ( message.evidence.length > 160 ) {
-            console.log(
-                'Evidence:',
-                edp.util.colorize( 'Compressed CSS, ignore evidence.', 'info' )
-            );
-        } else {
-            console.log( 'Evidence:', message.evidence );
-        }
-    }
-    console.log();
+    msg += message.message;
+    edp.log.warn( msg );
 }
 
-function outputTitle( title ) {
-    console.log();
-    console.log( edp.util.colorize( title, 'title' ) );
-    console.log( edp.util.colorize( '---\n', 'info' ) );
+function detect( candidates ) {
+    var invalidFiles = [];
+
+    var util = require( '../lib/util' );
+    candidates.forEach(function( item ){
+        if ( util.isIgnored( item, '.csslintignore' ) ) {
+            return;
+        }
+
+        var defaultConfig = require( '../lib/css/config' );
+
+        var csslint = require( 'csslint' ).CSSLint;
+        var source = fs.readFileSync( item, 'UTF-8' );
+
+        // TODO 这个defaultConfig跟 lib/css/config 的区别是啥?
+        // var defaultConf = csslint.getRuleset();
+        // conf = edp.util.extend( defaultConf, conf );
+
+        var csslintConfig = util.getConfig( '.csslintrc', item, defaultConfig );
+
+        var success = csslint.verify( source, csslintConfig );
+        if ( success
+             && success.messages
+             && success.messages.length > 0 ) {
+            edp.log.info( item );
+            invalidFiles.push( item );
+            success.messages.forEach( outputMessage );
+            console.log();
+        }
+    });
+
+    if ( !invalidFiles.length ) {
+        edp.log.info( 'All is well :-)' );
+    }
 }
 
 /**
@@ -231,35 +95,37 @@ cli.description = '使用csslint检测当前目录下所有CSS文件。';
  * @param {Object} opts
  */
 cli.main = function ( args, opts ) {
-    if ( opts[ 'no-color' ] ) {
-        colors.mode = 'none';
+    var candidates = [];
+
+    if ( !args.length ) {
+        candidates = edp.glob.sync([
+            '**/*.css', '!**/output/**',
+            '!**/test/**', '!**/node_modules/**'
+        ]);
     }
+    else {
+        for( var i = 0; i < args.length; i ++ ) {
+            var target = args[ i ];
+            if ( !fs.existsSync( target ) ) {
+                edp.log.warn( 'No such file or directory %s', target );
+                continue;
+            }
 
-    var result = [];
-
-    var target = args[ 0 ];
-    if (target) {
-        var fs = require( 'fs' );
-        if ( !fs.existsSync( target ) ) {
-            console.error( 'No such file or directory = [' + target + ']' );
-            process.exit( 1 );
-        } else {
-            var fsStat = fs.statSync( target );
-            if ( fsStat.isDirectory() ) {
-                readDir( target, null, null, result );
-            } else {
-                detectCSS(
-                    target,
-                    require( 'path' ).dirname( target ),
-                    null,
-                    result
-                );
+            var stat = fs.statSync( target );
+            if ( stat.isDirectory() ) {
+                target = target.replace( /[\/|\\]+$/, '' );
+                candidates.push.apply(
+                    candidates, edp.glob.sync( target + '/**/*.css' ) );
+            }
+            else if ( stat.isFile() ) {
+                candidates.push( target );
             }
         }
-    } else {
-        readDir( process.cwd(), null, null, result );
     }
-    report( result );
+
+    if ( candidates.length ) {
+        detect( candidates );
+    }
 };
 
 /**
