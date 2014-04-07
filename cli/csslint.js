@@ -45,14 +45,13 @@ function detect( candidates ) {
             return;
         }
 
-        var defaultConfig = require( '../lib/css/config' );
-
         var csslint = require( 'csslint' ).CSSLint;
         var source = fs.readFileSync( item, 'UTF-8' );
 
-        // TODO 这个defaultConfig跟 lib/css/config 的区别是啥?
-        // var defaultConf = csslint.getRuleset();
-        // conf = edp.util.extend( defaultConf, conf );
+        // ../lib/css/config只包含了edp的一些和默认参数不同的参数设置
+        // 所以，需要获取csslint的默认规则参数，然后和edp的设置混合起来
+        var defaultConfig = csslint.getRuleset();
+        edp.util.extend( defaultConfig, require( '../lib/css/config' ) );
 
         var csslintConfig = util.getConfig( '.csslintrc', item, defaultConfig );
 
