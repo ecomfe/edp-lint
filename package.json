@@ -10,7 +10,7 @@
     ],
     "dependencies": {
         "csslint": "~0.10.0",
-        "jshint": "~2.4.4",
+        "jshint": "~2.5.0",
         "edp-core": "~1.0.8",
         "glob": "~3.2.9"
     },
