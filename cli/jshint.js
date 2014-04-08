@@ -27,9 +27,12 @@ function detect( candidates ){
         var success = jshint( source, jshintConfig );
 
         function dump( err, idx ) {
-            if ( !err ){ return; }
-            edp.log.warn( '→ line %s, col %s: %s',
-                err.line, err.character, err.reason );
+            if ( !err ){ 
+                return;
+            }
+
+            (/^i/i.test(err.code) ? edp.log.info : edp.log.warn)
+                ('→ line %s, col %s: %s', err.line, err.character, err.reason);
         }
 
         if ( !success ) {
