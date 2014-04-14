@@ -6,32 +6,41 @@
 var edp = require( 'edp-core' );
 var fs = require( 'fs' );
 
+function detectSingleFile( item, invalidFiles ) {
+    var util = require( '../lib/util' );
+    if ( util.isIgnored( item, '.htmlhintignore' ) ) {
+        return;
+    }
+
+    var defaultConfig = require( '../lib/html/config' );
+    var htmlhintConfig = defaultConfig;
+
+    var htmlhint = require( '../lib/html/htmlhint');
+    var source = fs.readFileSync( item, 'utf-8' );
+    var errors = htmlhint.lint( source, htmlhintConfig );
+
+    function dump( err, idx ) {
+        edp.log.warn( '→ line %s, col %s: %s',
+            err.line, err.column, err.warning );
+    }
+
+    if ( errors && errors.length ) {
+        edp.log.info( item );
+        invalidFiles.push( item );
+        errors.forEach( dump );
+        console.log();
+    }
+}
+
 function detect( candidates ) {
     var invalidFiles = [];
 
-    var util = require( '../lib/util' );
-    candidates.forEach(function( item ){
-        if ( util.isIgnored( item, '.htmlhintignore' ) ) {
-            return;
+    candidates.forEach( function( item ){
+        try {
+            detectSingleFile( item, invalidFiles );
         }
-
-        var defaultConfig = require( '../lib/html/config' );
-        var htmlhintConfig = defaultConfig;
-
-        var htmlhint = require( '../lib/html/htmlhint');
-        var source = fs.readFileSync( item, 'utf-8' );
-        var errors = htmlhint.lint( source, htmlhintConfig );
-
-        function dump( err, idx ) {
-            edp.log.warn( '→ line %s, col %s: %s',
-                err.line, err.column, err.warning );
-        }
-
-        if ( errors && errors.length ) {
-            edp.log.info( item );
-            invalidFiles.push( item );
-            errors.forEach( dump );
-            console.log();
+        catch( ex ){
+            edp.log.error( item );
         }
     });
 
