@@ -6,6 +6,36 @@
 var edp = require( 'edp-core' );
 var fs = require( 'fs' );
 
+function detectSingleFile( item, invalidFiles ) {
+    var util = require( '../lib/util' );
+    if ( util.isIgnored( item ) ) {
+        return;
+    }
+
+    var defaultConfig = require( '../lib/js/config' );
+    var jshintConfig = util.getConfig( '.jshintrc', item, defaultConfig );
+
+    var jshint = require( 'jshint' ).JSHINT;
+    var source = fs.readFileSync( item, 'utf-8' );
+    var success = jshint( source, jshintConfig );
+
+    function dump( err, idx ) {
+        if ( !err ){ 
+            return;
+        }
+
+        (/^i/i.test(err.code) ? edp.log.info : edp.log.warn)
+            ('→ line %s, col %s: %s', err.line, err.character, err.reason);
+    }
+
+    if ( !success ) {
+        invalidFiles.push( item );
+        edp.log.info( item );
+        jshint.errors.forEach( dump );
+        console.log();
+    }
+}
+
 /**
  * @param {Array.<string>} candidates 所有需要检查的文件.
  * @return {Object} 检查的结果.
@@ -13,35 +43,8 @@ var fs = require( 'fs' );
 function detect( candidates ){
     var invalidFiles = [];
 
-    var util = require( '../lib/util' );
     candidates.forEach(function( item ){
-        if ( util.isIgnored( item ) ) {
-            return;
-        }
-
-        var defaultConfig = require( '../lib/js/config' );
-        var jshintConfig = util.getConfig( '.jshintrc', item, defaultConfig );
-
-        var jshint = require( 'jshint' ).JSHINT;
-        var source = fs.readFileSync( item, 'utf-8' );
-        var success = jshint( source, jshintConfig );
-
-        function dump( err, idx ) {
-            if ( !err ){ 
-                return;
-            }
-
-            (/^i/i.test(err.code) ? edp.log.info : edp.log.warn)
-                ('→ line %s, col %s: %s', err.line, err.character, err.reason);
-        }
-
-        if ( !success ) {
-            invalidFiles.push( item );
-            edp.log.info( item );
-            jshint.errors.forEach( dump );
-            console.log();
-            ok = false;
-        }
+        detectSingleFile( item, invalidFiles );
     });
 
     if ( !invalidFiles.length ) {
