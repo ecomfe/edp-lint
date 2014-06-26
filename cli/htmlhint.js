@@ -47,6 +47,9 @@ function detect( candidates ) {
     if ( !invalidFiles.length ) {
         edp.log.info( 'All is well :-)' );
     }
+    else {
+        process.exit( 1 );
+    }
 }
 
 /**
