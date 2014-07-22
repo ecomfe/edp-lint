@@ -1,7 +1,7 @@
 {
     "name": "edp-lint",
     "description": "Package for edp code detect",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "contributors": [
         { "name": "errorrik", "email": "errorrik@gmail.com" },
         { "name": "firede", "email" : "firede@firede.us" },
@@ -10,7 +10,7 @@
     ],
     "dependencies": {
         "csslint": "~0.10.0",
-        "jshint": "~2.5.0",
+        "edp-jshint": "~2.5.0",
         "edp-core": "~1.0.12",
         "glob": "~3.2.9"
     },

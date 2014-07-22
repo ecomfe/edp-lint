@@ -15,7 +15,7 @@ function detectSingleFile( item, invalidFiles ) {
     var defaultConfig = require( '../lib/js/config' );
     var jshintConfig = util.getConfig( '.jshintrc', item, defaultConfig );
 
-    var jshint = require( 'jshint' ).JSHINT;
+    var jshint = require( 'edp-jshint' ).JSHINT;
     var source = fs.readFileSync( item, 'utf-8' );
     var success = jshint( source, jshintConfig );
 
