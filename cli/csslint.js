@@ -3,8 +3,8 @@
  * @author Firede[firede@firede.us]
  */
 
-var edp = require( 'edp-core' );
-var fs = require( 'fs' );
+var edp = require('edp-core');
+var fs = require('fs');
 
 // 目前 csslint 项目正在考虑配置文件格式改 json 的问题：
 // https://github.com/stubbornella/csslint/issues/359
@@ -25,52 +25,52 @@ var fs = require( 'fs' );
  * @inner
  * @param {Object} message 检测信息对象
  */
-function outputMessage( message ) {
+function outputMessage(message) {
     var msg = '→ ';
     // 全局性的错误可能没有位置信息
-    if ( message.line && message.col ) {
-        msg += require( 'util' ).format( 'line %s, col %s: ',
-            message.line, message.col );
+    if (message.line && message.col) {
+        msg += require('util').format('line %s, col %s: ',
+            message.line, message.col);
     }
     msg += message.message;
-    edp.log.warn( msg );
+    edp.log.warn(msg);
 }
 
-function detect( candidates ) {
+function detect(candidates) {
     var invalidFiles = [];
 
-    var util = require( '../lib/util' );
-    candidates.forEach(function( item ){
-        if ( util.isIgnored( item, '.csslintignore' ) ) {
+    var util = require('../lib/util');
+    candidates.forEach(function(item) {
+        if (util.isIgnored(item, '.csslintignore')) {
             return;
         }
 
-        var csslint = require( 'csslint' ).CSSLint;
-        var source = fs.readFileSync( item, 'UTF-8' );
+        var csslint = require('csslint').CSSLint;
+        var source = fs.readFileSync(item, 'UTF-8');
 
         // ../lib/css/config只包含了edp的一些和默认参数不同的参数设置
         // 所以，需要获取csslint的默认规则参数，然后和edp的设置混合起来
         var defaultConfig = csslint.getRuleset();
-        edp.util.extend( defaultConfig, require( '../lib/css/config' ) );
+        edp.util.extend(defaultConfig, require('../lib/css/config'));
 
-        var csslintConfig = util.getConfig( '.csslintrc', item, defaultConfig );
+        var csslintConfig = util.getConfig('.csslintrc', item, defaultConfig);
 
-        var success = csslint.verify( source, csslintConfig );
-        if ( success
-             && success.messages
-             && success.messages.length > 0 ) {
-            edp.log.info( item );
-            invalidFiles.push( item );
-            success.messages.forEach( outputMessage );
+        var success = csslint.verify(source, csslintConfig);
+        if (success
+            && success.messages
+            && success.messages.length > 0) {
+            edp.log.info(item);
+            invalidFiles.push(item);
+            success.messages.forEach(outputMessage);
             console.log();
         }
     });
 
-    if ( !invalidFiles.length ) {
-        edp.log.info( 'All is well :-)' );
+    if (!invalidFiles.length) {
+        edp.log.info('All is well :-)');
     }
     else {
-        process.exit( 1 );
+        process.exit(1);
     }
 }
 
@@ -95,16 +95,16 @@ cli.description = '使用csslint检测当前目录下所有CSS文件。';
  * @param {Array.<string>} args
  * @param {Object} opts
  */
-cli.main = function ( args, opts ) {
+cli.main = function(args, opts) {
     var patterns = [
         '**/*.css', '!**/output/**',
         '!**/test/**', '!**/node_modules/**'
     ];
-    var candidates = require( '../lib/util' ).getCandidates(
-        args, patterns );
+    var candidates = require('../lib/util').getCandidates(
+        args, patterns);
 
-    if ( candidates.length ) {
-        detect( candidates );
+    if (candidates.length) {
+        detect(candidates);
     }
 };
 

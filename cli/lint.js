@@ -33,8 +33,8 @@ cli.description = 'edp代码规范检查';
 /**
  * 模块命令行运行入口
  */
-cli.main = function () {
-    console.log( 'See `edp lint --help`' );
+cli.main = function() {
+    console.log('See `edp lint --help`');
 };
 
 /**

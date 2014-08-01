@@ -15,16 +15,21 @@
  *  
  **/
 
-var path = require( 'path' );
+var path = require('path');
 
-var util = require( '../lib/util' );
+var util = require('../lib/util');
 
-describe( 'util', function(){
-    it( 'getIgnorePatterns', function(){
-        var file = path.join( __dirname, 'data', '.jshintignore' );
-        var patterns = util.getIgnorePatterns( file );
+describe('util', function(){
+    it('getIgnorePatterns', function() {
+        var file = path.join(__dirname, 'data', '.jshintignore');
+        var patterns = util.getIgnorePatterns(file);
 
-        expect( patterns ).toEqual( [ 'a/**', 'b', 'c/**', 'd' ] );
+        expect(patterns).toEqual([ 'a/**', 'b', 'c/**', 'd' ]);
+    });
+
+    it('isIgnored', function(){
+        process.chdir(path.join(__dirname, '..'));
+        expect(util.isIgnored('lib/js/config.js')).toBe(true);
     });
 });
 

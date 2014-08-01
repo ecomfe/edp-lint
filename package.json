@@ -12,7 +12,9 @@
         "csslint": "~0.10.0",
         "edp-jshint": "~2.5.0",
         "edp-core": "~1.0.12",
-        "glob": "~3.2.9"
+        "glob": "~3.2.9",
+        "jscs": "~1.5.9",
+        "async": "~0.9.0"
     },
     "repository": "git://github.com/ecomfe/edp-lint",
     "scripts": {

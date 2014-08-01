@@ -1,1 +1,2 @@
-lib/html/html5.js
+lib/html/*.js
+lib/js/config.js

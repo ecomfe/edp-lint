@@ -3,52 +3,52 @@
  * @author chris[wfsr@foxmail.com]
  */
 
-var edp = require( 'edp-core' );
-var fs = require( 'fs' );
+var edp = require('edp-core');
+var fs = require('fs');
 
-function detectSingleFile( item, invalidFiles ) {
-    var util = require( '../lib/util' );
-    if ( util.isIgnored( item, '.htmlhintignore' ) ) {
+function detectSingleFile(item, invalidFiles) {
+    var util = require('../lib/util');
+    if (util.isIgnored(item, '.htmlhintignore')) {
         return;
     }
 
-    var defaultConfig = require( '../lib/html/config' );
+    var defaultConfig = require('../lib/html/config');
     var htmlhintConfig = defaultConfig;
 
-    var htmlhint = require( '../lib/html/htmlhint');
-    var source = fs.readFileSync( item, 'utf-8' );
-    var errors = htmlhint.lint( source, htmlhintConfig );
+    var htmlhint = require('../lib/html/htmlhint');
+    var source = fs.readFileSync(item, 'utf-8');
+    var errors = htmlhint.lint(source, htmlhintConfig);
 
-    function dump( err, idx ) {
-        edp.log.warn( '→ line %s, col %s: %s',
-            err.line, err.column, err.warning );
+    function dump(err, idx) {
+        edp.log.warn('→ line %s, col %s: %s',
+            err.line, err.column, err.warning);
     }
 
-    if ( errors && errors.length ) {
-        edp.log.info( item );
-        invalidFiles.push( item );
-        errors.forEach( dump );
+    if (errors && errors.length) {
+        edp.log.info(item);
+        invalidFiles.push(item);
+        errors.forEach(dump);
         console.log();
     }
 }
 
-function detect( candidates ) {
+function detect(candidates) {
     var invalidFiles = [];
 
-    candidates.forEach( function( item ){
+    candidates.forEach(function(item) {
         try {
-            detectSingleFile( item, invalidFiles );
+            detectSingleFile(item, invalidFiles);
         }
-        catch( ex ){
-            edp.log.error( item );
+        catch (ex) {
+            edp.log.error(item);
         }
     });
 
-    if ( !invalidFiles.length ) {
-        edp.log.info( 'All is well :-)' );
+    if (!invalidFiles.length) {
+        edp.log.info('All is well :-)');
     }
     else {
-        process.exit( 1 );
+        process.exit(1);
     }
 }
 
@@ -72,16 +72,16 @@ cli.description = '使用htmlhint检测当前目录下所有HTML文件';
  *
  * @param {Array.<string>} args
  */
-cli.main = function (args) {
+cli.main = function(args) {
     var patterns = [
         '**/*.{html,htm}', '!**/output/**',
         '!**/test/**', '!**/node_modules/**'
     ];
-    var candidates = require( '../lib/util' ).getCandidates(
-        args, patterns );
+    var candidates = require('../lib/util').getCandidates(
+        args, patterns);
 
-    if ( candidates.length ) {
-        detect( candidates );
+    if (candidates.length) {
+        detect(candidates);
     }
 };
 
