@@ -15,6 +15,10 @@
  *  
  **/
 
+var edp = require('edp-core');
+var fs = require('fs');
+var path = require('path');
+
 /**
  * 命令行配置项
  *
@@ -31,10 +35,51 @@ var cli = {};
 cli.description = 'edp代码规范检查';
 
 /**
+ * 命令选项信息
+ *
+ * @type {Array}
+ */
+cli.options = [
+    'type:'
+];
+
+/**
  * 模块命令行运行入口
  */
-cli.main = function() {
-    console.log('See `edp lint --help`');
+cli.main = function(args, opts) {
+
+    var checkers = [];
+    var types = (opts.type || 'js,less,css,html').split(/\s*,\s*/);
+    var extensions = [];
+
+    types.forEach(function (type) {
+        var target = '../lib/' + type + '/checker.js';
+        if (fs.existsSync(path.join(__dirname, target))) {
+            var checker = require(target);
+            extensions = extensions.concat(checker.extensions);
+            
+            checkers.push(checker);
+        }
+        else {
+            edp.log.warn('Invalid checker %s from %s', type, target);
+        }
+    });
+
+    var validPattern = '**/*.' + (extensions.length > 1 ? '{' + extensions.join(',') + '}' : extensions[0]);
+    var patterns = [
+        validPattern,
+        '!**/{output,asset,dist,release,doc,dep,report}/**',
+        '!**/test/**',
+        '!**/node_modules/**'
+    ];
+
+    var candidates = require('../lib/util').getCandidates(args, patterns);
+
+    if (candidates.length) {
+        var lint = require('../lib/lint');
+        lint.check(candidates, checkers);
+    }
+    
 };
 
 /**
