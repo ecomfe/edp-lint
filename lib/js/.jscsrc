@@ -42,7 +42,7 @@
     "requireBlocksOnNewline": true,
     "disallowEmptyBlocks": true,
     "requireSpacesInsideObjectBrackets": "all",
-    "requireSpacesInsideArrayBrackets": "allButNested",
+    "requireSpacesInsideArrayBrackets": null,
     "disallowSpacesInsideParentheses": true,
     "requireCommaBeforeLineBreak": true,
     "requireOperatorBeforeLineBreak": [],
@@ -77,7 +77,7 @@
     },
 
     "requireCapitalizedConstructors": true,
-    "safeContextKeyword": ["me", "self"],
+    "safeContextKeyword": ["me", "self", "parent", "super", "context"],
     "requireDotNotation": true,
 
     "validateJSDoc": {
