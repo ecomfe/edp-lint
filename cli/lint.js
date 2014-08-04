@@ -68,9 +68,7 @@ cli.main = function (args, opts) {
     var validPattern = '**/*.' + (extensions.length > 1 ? '{' + extensions.join(',') + '}' : extensions[0]);
     var patterns = [
         validPattern,
-        '!**/{output,asset,dist,release,doc,dep,report}/**',
-        '!**/test/**',
-        '!**/node_modules/**'
+        '!**/{output,test,node_modules,asset,dist,release,doc,dep,report}/**'
     ];
 
     var candidates = require('../lib/util').getCandidates(args, patterns);
