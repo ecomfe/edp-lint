@@ -9,8 +9,13 @@ lint
     edp lint --type=css,less
     edp lint src/css --type=less
     edp lint *.js
+    edp jshint *.js
     edp lint *.css
+    edp csslint *.css
+    edp lint *.less
+    edp lesslint *.less
     edp lint *.html
+    edp htmlhint *.html
 
 ### Options
 
