@@ -3,55 +3,6 @@
  * @author chris[wfsr@foxmail.com]
  */
 
-var edp = require('edp-core');
-var fs = require('fs');
-
-function detectSingleFile(item, invalidFiles) {
-    var util = require('../lib/util');
-    if (util.isIgnored(item, '.htmlhintignore')) {
-        return;
-    }
-
-    var defaultConfig = require('../lib/html/config');
-    var htmlhintConfig = defaultConfig;
-
-    var htmlhint = require('../lib/html/htmlhint');
-    var source = fs.readFileSync(item, 'utf-8');
-    var errors = htmlhint.lint(source, htmlhintConfig);
-
-    function dump(err, idx) {
-        edp.log.warn('→ line %s, col %s: %s',
-            err.line, err.column, err.warning);
-    }
-
-    if (errors && errors.length) {
-        edp.log.info(item);
-        invalidFiles.push(item);
-        errors.forEach(dump);
-        console.log();
-    }
-}
-
-function detect(candidates) {
-    var invalidFiles = [];
-
-    candidates.forEach(function(item) {
-        try {
-            detectSingleFile(item, invalidFiles);
-        }
-        catch (ex) {
-            edp.log.error(item);
-        }
-    });
-
-    if (!invalidFiles.length) {
-        edp.log.info('All is well :-)');
-    }
-    else {
-        process.exit(1);
-    }
-}
-
 /**
  * 命令行配置项
  *
@@ -74,14 +25,15 @@ cli.description = '使用htmlhint检测当前目录下所有HTML文件';
  */
 cli.main = function(args) {
     var patterns = [
-        '**/*.{html,htm}', '!**/output/**',
-        '!**/test/**', '!**/node_modules/**'
+        '**/*.{html,htm}',
+        '!**/{output,test,node_modules,asset,dist,release,doc,dep,report}/**'
     ];
-    var candidates = require('../lib/util').getCandidates(
-        args, patterns);
+
+    var candidates = require('../lib/util').getCandidates(args, patterns);
 
     if (candidates.length) {
-        detect(candidates);
+        var lint = require('../lib/lint');
+        lint.check(candidates, [require('../lib/html/checker')]);
     }
 };
 

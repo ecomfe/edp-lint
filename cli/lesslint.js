@@ -1,6 +1,6 @@
 /**
- * @file Javascript检测模块
- * @author errorrik[errorrik@gmail.com]
+ * @file LESS 检测模块
+ * @author chris[wfsr@foxmail.com]
  */
 
 
@@ -17,16 +17,17 @@ var cli = {};
  *
  * @type {string}
  */
-cli.description = '使用jshint检测当前目录下所有JavaScript文件。';
+cli.description = '使用recess检测当前目录下所有LESS文件。';
 
 /**
  * 模块命令行运行入口
  *
  * @param {Array.<string>} args
+ * @param {Object} opts
  */
-cli.main = function (args) {
+cli.main = function (args, opts) {
     var patterns = [
-        '**/*.js',
+        '**/*.less',
         '!**/{output,test,node_modules,asset,dist,release,doc,dep,report}/**'
     ];
 
@@ -34,7 +35,7 @@ cli.main = function (args) {
 
     if (candidates.length) {
         var lint = require('../lib/lint');
-        lint.check(candidates, [require('../lib/js/checker')]);
+        lint.check(candidates, [require('../lib/less/checker')]);
     }
 };
 
