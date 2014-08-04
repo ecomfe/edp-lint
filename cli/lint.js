@@ -46,7 +46,7 @@ cli.options = [
 /**
  * 模块命令行运行入口
  */
-cli.main = function(args, opts) {
+cli.main = function (args, opts) {
 
     var checkers = [];
     var types = (opts.type || 'js,less,css,html').split(/\s*,\s*/);
