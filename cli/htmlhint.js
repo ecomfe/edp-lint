@@ -23,7 +23,7 @@ cli.description = '使用htmlhint检测当前目录下所有HTML文件';
  *
  * @param {Array.<string>} args
  */
-cli.main = function(args) {
+cli.main = function (args) {
     var patterns = [
         '**/*.{html,htm}',
         '!**/{output,test,node_modules,asset,dist,release,doc,dep,report}/**'
