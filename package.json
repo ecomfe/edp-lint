@@ -1,24 +1,36 @@
 {
-    "name": "edp-lint",
-    "description": "Package for edp code detect",
-    "version": "1.0.3",
-    "contributors": [
-        { "name": "errorrik", "email": "errorrik@gmail.com" },
-        { "name": "firede", "email" : "firede@firede.us" },
-        { "name": "chris", "email" : "wfsr@foxmail.com" },
-        { "name": "otakustay", "email" : "otakustay@live.com" }
-    ],
-    "dependencies": {
-        "csslint": "~0.10.0",
-        "edp-recess": "~1.1.10",
-        "edp-jshint": "~2.5.0",
-        "edp-core": "~1.0.12",
-        "glob": "~3.2.9",
-        "jscs": "~1.5.9",
-        "async": "~0.9.0"
+  "name": "edp-lint",
+  "description": "Package for edp code detect",
+  "version": "1.0.3",
+  "contributors": [
+    {
+      "name": "errorrik",
+      "email": "errorrik@gmail.com"
     },
-    "repository": "git://github.com/ecomfe/edp-lint",
-    "scripts": {
-        "test": "make -C test"
+    {
+      "name": "firede",
+      "email": "firede@firede.us"
+    },
+    {
+      "name": "chris",
+      "email": "wfsr@foxmail.com"
+    },
+    {
+      "name": "otakustay",
+      "email": "otakustay@live.com"
     }
+  ],
+  "dependencies": {
+    "async": "~0.9.0",
+    "csslint": "~0.10.0",
+    "edp-core": "~1.0.12",
+    "edp-jscs": "^1.5.10",
+    "edp-jshint": "~2.5.0",
+    "edp-recess": "~1.1.10",
+    "glob": "~3.2.9"
+  },
+  "repository": "git://github.com/ecomfe/edp-lint",
+  "scripts": {
+    "test": "make -C test"
+  }
 }
