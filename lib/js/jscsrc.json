@@ -77,7 +77,6 @@
     },
 
     "requireCapitalizedConstructors": true,
-    "safeContextKeyword": ["me", "self", "parent", "super", "context"],
     "requireDotNotation": true,
 
     "validateJSDoc": {
