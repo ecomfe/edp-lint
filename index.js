@@ -8,5 +8,6 @@ exports.css = {
 };
 
 exports.js = {
-    config: require('./lib/js/config')
+    config: require('./lib/js/config'),
+    jscsConfig: require('./lib/js/jscsrc.json')
 };
