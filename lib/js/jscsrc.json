@@ -1,33 +1,18 @@
 {
-    "additionalRules": [],
-    "fileExtensions": [".js"],
-
-    "excludeFiles": [],
-
-    "requireCurlyBraces": [
-        "if",
-        "else",
-        "for",
-        "while",
-        "do",
-        "try",
-        "catch"
-    ],
-
     "requireSpaceAfterKeywords": [
         "if",
         "else",
         "for",
         "while",
-        "do",
+        "function",
         "switch",
-        "return",
+        "do",
         "try",
-        "catch"
+        "catch",
+        "finally"
     ],
 
     "requireSpaceBeforeBlockStatements": true,
-    "requireParenthesesAroundIIFE": true,
     "requireSpacesInConditionalExpression": true,
 
     "disallowSpacesInNamedFunctionExpression": {
@@ -38,14 +23,27 @@
         "beforeOpeningRoundBrace": true
     },
 
+    "disallowSpaceAfterObjectKeys": true,
+    "requireSpaceBeforeObjectValues": true,
+    "disallowSpaceBeforeKeywords": [",", ";"],
+
+    "disallowSpacesInCallExpression": true,
+    "disallowSpacesInFunctionDeclaration": {
+        "beforeOpeningRoundBrace": true
+    },
+    "disallowSpacesInNamedFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
+
+    "disallowTrailingWhitespace": true,
+
     "disallowMultipleVarDecl": true,
     "requireBlocksOnNewline": true,
     "disallowEmptyBlocks": true,
-    "requireSpacesInsideObjectBrackets": "all",
-    "requireSpacesInsideArrayBrackets": null,
+    "disallowSpacesInsideObjectBrackets": true,
+    "disallowSpacesInsideArrayBrackets": true,
     "disallowSpacesInsideParentheses": true,
     "requireCommaBeforeLineBreak": true,
-    "requireOperatorBeforeLineBreak": [],
     "disallowSpaceAfterPrefixUnaryOperators": true,
     "disallowSpaceBeforePostfixUnaryOperators": true,
 
@@ -59,15 +57,12 @@
     ],
 
     "requireSpaceAfterBinaryOperators": true,
-    "requireCamelCaseOrUpperCaseIdentifiers": null,
-    "disallowKeywords": ["with", "eval"],
-    "disallowMultipleLineStrings": true,
+    "disallowKeywords": ["with"],
     "validateLineBreaks": "LF",
-    "validateQuoteMarks": { "mark": "'", "escape": true },
     "validateIndentation": 4,
     "disallowMixedSpacesAndTabs": true,
     "disallowTrailingComma": true,
-    "requireKeywordsOnNewLine": ["else", "catch"],
+    "requireKeywordsOnNewLine": ["else", "catch", "finally"],
     "requireLineFeedAtFileEnd": true,
 
     "maximumLineLength": {
@@ -76,13 +71,11 @@
         "allowRegex": true
     },
 
-    "requireCapitalizedConstructors": true,
-    "requireDotNotation": true,
+    "requireSpaceAfterLineComment": true,
 
     "validateJSDoc": {
         "checkParamNames": true,
         "requireParamTypes": true
-    },
+    }
 
-    "requireSpaceAfterLineComment": true
 }
