@@ -1,18 +1,18 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Baidu.com, Inc. All Rights Reserved
- * $Id$ 
- * 
+ * $Id$
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * cli/lint.js ~ 2014/04/14 15:12:48
  * @author leeight(liyubei@baidu.com)
- * @version $Revision$ 
- * @description 
- *  
+ * @version $Revision$
+ * @description
+ *
  **/
 
 var edp = require('edp-core');
@@ -40,11 +40,15 @@ cli.description = 'edp代码规范检查';
  * @type {Array}
  */
 cli.options = [
-    'type:'
+    'type:',
+    'lookup:'
 ];
+
 
 /**
  * 模块命令行运行入口
+ * @param {Array.<string>} args 命令行参数列表
+ * @param {Object} opts 命令行配置项对象
  */
 cli.main = function (args, opts) {
 
@@ -57,7 +61,7 @@ cli.main = function (args, opts) {
         if (fs.existsSync(path.join(__dirname, target))) {
             var checker = require(target);
             extensions = extensions.concat(checker.extensions);
-            
+
             checkers.push(checker);
         }
         else {
@@ -75,9 +79,9 @@ cli.main = function (args, opts) {
 
     if (candidates.length) {
         var lint = require('../lib/lint');
-        lint.check(candidates, checkers);
+        lint.check(candidates, checkers, opts);
     }
-    
+
 };
 
 /**
