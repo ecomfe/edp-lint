@@ -15,14 +15,6 @@
     "requireSpaceBeforeBlockStatements": true,
     "requireSpacesInConditionalExpression": true,
 
-    "disallowSpacesInNamedFunctionExpression": {
-        "beforeOpeningRoundBrace": true
-    },
-
-    "disallowSpacesInFunctionDeclaration": {
-        "beforeOpeningRoundBrace": true
-    },
-
     "disallowSpaceAfterObjectKeys": true,
     "requireSpaceBeforeObjectValues": true,
     "disallowSpaceBeforeKeywords": [",", ";"],
