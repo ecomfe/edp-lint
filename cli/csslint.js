@@ -37,7 +37,7 @@ cli.options = [
 cli.main = function (args, opts) {
     var patterns = [
         '**/*.css',
-        '!**/{output,test,node_modules,asset,dist,release,doc,dep,report}/**'
+        '!**/{output,test,node_modules,asset,dist,release,doc,dep}/**'
     ];
 
     var candidates = require('../lib/util').getCandidates(args, patterns);
