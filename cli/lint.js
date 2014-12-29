@@ -52,35 +52,10 @@ cli.options = [
  */
 cli.main = function (args, opts) {
 
-    var checkers = [];
-    var types = (opts.type || 'js,less,css,html').split(/\s*,\s*/);
-    var extensions = [];
+    var fecs = require('fecs');
+    var options = fecs.getOptions(process.argv.slice(3));
 
-    types.forEach(function (type) {
-        var target = '../lib/' + type + '/checker.js';
-        if (fs.existsSync(path.join(__dirname, target))) {
-            var checker = require(target);
-            extensions = extensions.concat(checker.extensions);
-
-            checkers.push(checker);
-        }
-        else {
-            edp.log.warn('Invalid checker %s from %s', type, target);
-        }
-    });
-
-    var validPattern = '**/*.' + (extensions.length > 1 ? '{' + extensions.join(',') + '}' : extensions[0]);
-    var patterns = [
-        validPattern,
-        '!**/{output,test,node_modules,asset,dist,release,doc,dep}/**'
-    ];
-
-    var candidates = require('../lib/util').getCandidates(args, patterns);
-
-    if (candidates.length) {
-        var lint = require('../lib/lint');
-        lint.check(candidates, checkers, opts);
-    }
+    fecs[options.command](options);
 
 };
 
