@@ -1,7 +1,7 @@
 {
   "name": "edp-lint",
   "description": "Package for edp code detect",
-  "version": "1.0.7",
+  "version": "1.0.8-beta.1",
   "contributors": [
     {
       "name": "leeight",
