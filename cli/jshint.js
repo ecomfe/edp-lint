@@ -25,7 +25,7 @@ cli.description = '使用jshint检测当前目录下所有JavaScript文件。';
  * @type {Array}
  */
 cli.options = [
-    'lookup:'
+    'lookup'
 ];
 
 /**
@@ -35,17 +35,7 @@ cli.options = [
  * @param {Object} opts 命令行配置项对象
  */
 cli.main = function (args, opts) {
-    var patterns = [
-        '**/*.js',
-        '!**/{output,test,node_modules,asset,dist,release,doc,dep}/**'
-    ];
-
-    var candidates = require('../lib/util').getCandidates(args, patterns);
-
-    if (candidates.length) {
-        var lint = require('../lib/lint');
-        lint.check(candidates, [require('../lib/js/checker')], opts);
-    }
+    require('../lib/util').fecsAdapter('js');
 };
 
 /**

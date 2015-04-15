@@ -26,12 +26,9 @@
   ],
   "dependencies": {
     "async": "~0.9.0",
-    "csslint": "~0.10.0",
     "edp-core": "~1.0.12",
-    "edp-jshint": "~2.5.0",
-    "edp-recess": "~1.1.10",
-    "glob": "~3.2.9",
-    "jscs": "^1.7.3"
+    "fecs": "*",
+    "glob": "~3.2.9"
   },
   "repository": "git://github.com/ecomfe/edp-lint",
   "scripts": {

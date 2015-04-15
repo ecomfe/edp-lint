@@ -24,7 +24,7 @@ cli.description = '使用htmlhint检测当前目录下所有HTML文件';
  * @type {Array}
  */
 cli.options = [
-    'lookup:'
+    'lookup'
 ];
 
 /**
@@ -34,17 +34,7 @@ cli.options = [
  * @param {Object} opts 命令行配置项对象
 */
 cli.main = function (args, opts) {
-    var patterns = [
-        '**/*.{html,htm}',
-        '!**/{output,test,node_modules,asset,dist,release,doc,dep}/**'
-    ];
-
-    var candidates = require('../lib/util').getCandidates(args, patterns);
-
-    if (candidates.length) {
-        var lint = require('../lib/lint');
-        lint.check(candidates, [require('../lib/html/checker')], opts);
-    }
+    require('../lib/util').fecsAdapter('html');
 };
 
 /**
