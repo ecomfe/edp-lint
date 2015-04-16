@@ -3,6 +3,7 @@
  * @author chris[wfsr@foxmail.com]
  */
 
+var util = require('../lib/util');
 
 /**
  * 命令行配置项
@@ -24,9 +25,7 @@ cli.description = '使用recess检测当前目录下所有LESS文件。';
  *
  * @type {Array}
  */
-cli.options = [
-    'lookup'
-];
+cli.options = util.getFecsCheckOptions();
 
 /**
  * 模块命令行运行入口
@@ -35,7 +34,7 @@ cli.options = [
  * @param {Object} opts 命令行配置项对象
  */
 cli.main = function (args, opts) {
-    require('../lib/util').fecsAdapter('less');
+    util.fecsAdapter('less');
 };
 
 /**

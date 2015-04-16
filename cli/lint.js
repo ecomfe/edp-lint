@@ -15,9 +15,7 @@
  *
  **/
 
-var edp = require('edp-core');
-var fs = require('fs');
-var path = require('path');
+var util = require('../lib/util');
 
 /**
  * 命令行配置项
@@ -39,10 +37,7 @@ cli.description = 'edp代码规范检查';
  *
  * @type {Array}
  */
-cli.options = [
-    'type:',
-    'lookup'
-];
+cli.options = util.getFecsCheckOptions(true);
 
 
 /**
@@ -51,7 +46,7 @@ cli.options = [
  * @param {Object} opts 命令行配置项对象
  */
 cli.main = function (args, opts) {
-    require('../lib/util').fecsAdapter();
+    util.fecsAdapter();
 };
 
 /**

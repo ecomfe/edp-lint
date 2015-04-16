@@ -1,23 +1,11 @@
-lint
+htmlhint
 ---------
 
 ### Usage
 
-    edp lint [path] [--type=js|css|less|html]
+    edp htmlhint [path] [--type=js|css|less|html]
 
-    edp lint --type=js
-    edp lint --type=css,less
-    edp lint src/css --type=less
-    edp lint *.js
-    edp jshint *.js
-    edp lint *.css
-    edp csslint *.css
-    edp lint *.less
-    edp lesslint *.less
-    edp lint *.html
     edp htmlhint *.html
-    edp lint --lookup false
-    edp lint --no-lookup
 
 ### Options
 + --color - 是否使用颜色高亮
@@ -32,14 +20,10 @@ lint
 + --silent - 是否隐藏所有通过 `console.log` 输出的信息
 + --sort - 是否对信息按行列作升序排序
 + --stream - 是否使用 `process.stdin` 作为输入
-+ --type - 指定校验器类型，可以指定一个或多个，以半角逗号隔开。目前可用的校验器类型有 `js`|`css`|`less`|`html`。
 
 
 ### Notes
 
-- edp csslint 等同于 edp lint --type=css
 - edp htmlhint 等同于 edp lint --type=html
-- edp jshint 等同于 edp lint --type=js
-- edp lesslint 等同于 edp lint --type=less
 
 `edp-lint@2.0.0` 后使用 `fecs` 实现全部的前端代码检查，访问 [fecs.wiki](https://github.com/ecomfe/fecs/wiki) 获取更多信息。
