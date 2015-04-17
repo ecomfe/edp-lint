@@ -1,7 +1,7 @@
 {
   "name": "edp-lint",
   "description": "Package for edp code detect",
-  "version": "1.0.8-beta.1",
+  "version": "2.0.0-beta.1",
   "contributors": [
     {
       "name": "leeight",
@@ -25,10 +25,7 @@
     }
   ],
   "dependencies": {
-    "async": "~0.9.0",
-    "edp-core": "~1.0.12",
-    "fecs": "*",
-    "glob": "~3.2.9"
+    "fecs": "*"
   },
   "repository": "git://github.com/ecomfe/edp-lint",
   "scripts": {
