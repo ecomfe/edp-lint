@@ -1,3 +1,9 @@
+/**
+ * @file  代码检查专属模块
+ * @author chris[wfsr@foxmail.com]
+ * @author errorrik[errorrik@gmail.com]
+ */
+
 define(function (require) {
     function getSpecialForm() {
         return document.getElementById('special-form');
@@ -13,25 +19,26 @@ define(function (require) {
 
     var resultTpl = ''
         + '<!-- for: ${data} as ${info}, ${index} -->'
-        +   '<article><header><i data-cmd="switch-view" class="fa fa-code"></i>${info.path}</header><ul class="info-list">'
+        + '<article>'
+        +   '<header>'
+        +       '<i data-cmd="switch-view" data-index="${index}" class="fa fa-code"></i>${info.relative}'
+        +   '</header>'
+        +   '<ul class="info-list">'
         +   '<!-- for: ${info.errors} as ${msg} -->'
         +     '<!-- var: type = ${msg.severity} === 1 ? "warning" : "error" -->'
         +     '<li><span class="label label-${type}">${type}</span>'
-        +     '<i class="label"><!-- if: ${msg.line} -->line: ${msg.line} col: ${msg.column}<!-- else -->common<!-- /if --></i>'
-        +     '${msg.message}<b>${msg.rule}</b></li>'
+        +     '<i class="label">'
+        +     '<!-- if: ${msg.line} -->line: ${msg.line} col: ${msg.column}<!-- else -->common<!-- /if -->'
+        +     '</i>'
+        +     '${msg.message} (<b>${msg.rule}</b>)</li>'
         +   '<!-- /for -->'
         +   '</ul>'
         +   '<div class="code-panel" style="display:none">'
-        +     '<ul class="info-tip" id="code-info-tip-${index}">'
-        +     '<!-- var: lenArr = new Array(${info.code}.replace(/\\n$/,"").split("\\n").length) -->'
-        +     '<!-- for: ${lenArr} as ${nomean}, ${i} -->'
-        +       '<!-- var: index = ${i} - 0 + 1 -->'
-        +       '<li>${index}</li>'
-        +     '<!-- /for -->'
-        +     '</ul>'
-        +     '<pre>${info.code}</pre>'
+        +     '<ul class="info-tip" id="code-info-tip-${index}"></ul>'
+        +     '<pre id="code-info-content-${index}">loading...</pre>'
         +   '</div></article>'
         + '<!-- /for -->';
+
     var resultRender = require('etpl').compile(resultTpl);
 
     function getOptions() {
@@ -41,6 +48,7 @@ define(function (require) {
 
         var name;
         var value;
+
         $.each($(form).serializeArray(), function (i, pair) {
             name = pair.name;
             value = pair.value;
@@ -51,6 +59,7 @@ define(function (require) {
         return options;
     }
 
+    var cached;
     function startLint() {
         var btn = getStartButton();
         btn.disabled = true;
@@ -71,31 +80,45 @@ define(function (require) {
 
                 panel.innerHTML = resultRender({data: data});
 
-                for (var i = 0, l = data.length; i < l; i++) {
-                    var tipRendered = {};
-                    var tipLis = document.getElementById('code-info-tip-' + i)
-                        .getElementsByTagName('li');
-                    var messages = data[i].errors;
-
-                    for (var j = 0, ml = messages.length; j < ml; j++) {
-                        var info = messages[j];
-                        var line = info.line;
-                        if (line) {
-                            if (!tipRendered[line]) {
-                                var lineNum = line - 1;
-                                var tipLi = tipLis[lineNum];
-                                tipLi.className = 'tip-' + (info.severity === 1 ? 'warning' : 'error');
-                                tipLi.innerHTML = line + '<i>' + info.message + '</i>';
-                            }
-
-                            tipRendered[line] = 1;
-                        }
-                    }
-                }
+                cached = data;
             }
         });
 
         return false;
+    }
+
+    function renderCode(code, index) {
+
+        $('#code-info-content-' + index).text(code);
+
+        var tipLis = document.getElementById('code-info-tip-' + index);
+        var messages = cached[index].errors;
+
+        var lis = '';
+        var lines = code.split(/\n/).length;
+        for (var i = 1; i <= lines; i++) {
+            lis += '<li>' + i + '</li>';
+        }
+
+        tipLis.innerHTML = lis;
+
+        tipLis = tipLis.getElementsByTagName('li');
+
+        var tipRendered = {};
+        for (var j = 0, info, line; info = messages[j++];) {
+            line = info.line;
+            if (line) {
+                if (!tipRendered[line]) {
+                    var lineNum = line - 1;
+                    var tipLi = tipLis[lineNum];
+                    tipLi.className = 'tip-' + (info.severity === 1 ? 'warning' : 'error');
+                    tipLi.innerHTML = line + '<i>' + info.message + '</i>';
+                }
+
+                tipRendered[line] = 1;
+            }
+        }
+
     }
 
     function switchView(e) {
@@ -105,11 +128,27 @@ define(function (require) {
         if (target.getAttribute('data-cmd') === 'switch-view') {
             var wrap = target.parentNode.parentNode;
             var listWrap = wrap.getElementsByTagName('ul')[0];
-            var codeWrap = wrap.getElementsByTagName('div')[0];;
+            var codeWrap = wrap.getElementsByTagName('div')[0];
             if (target.className.indexOf('fa-code') > 0) {
                 target.className = 'fa fa-list';
                 listWrap.style.display = 'none';
                 codeWrap.style.display = '';
+
+                var index = target.getAttribute('data-index') | 0;
+
+                if (index < 0) {
+                    return;
+                }
+
+                $.post(
+                    '/edp-lint/read',
+                    {
+                        path: cached[index].path
+                    }
+                ).done(function (text) {
+                    target.setAttribute('data-index', -1);
+                    renderCode(text, index);
+                });
             }
             else {
                 target.className = 'fa fa-code';
@@ -126,6 +165,7 @@ define(function (require) {
         },
 
         unload: function () {
+            cached = null;
             getSpecialForm().onclick = null;
             getResultPanel().onclick = null;
         }

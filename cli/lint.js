@@ -1,18 +1,6 @@
-/***************************************************************************
- *
- * Copyright (c) 2014 Baidu.com, Inc. All Rights Reserved
- * $Id$
- *
- **************************************************************************/
-
-
-
 /**
- * cli/lint.js ~ 2014/04/14 15:12:48
+ * @file 检查主入口
  * @author leeight(liyubei@baidu.com)
- * @version $Revision$
- * @description
- *
  **/
 
 var util = require('../lib/util');
@@ -55,24 +43,3 @@ cli.main = function (args, opts) {
  * @type {Object}
  */
 exports.cli = cli;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* vim: set ts=4 sw=4 sts=4 tw=100: */

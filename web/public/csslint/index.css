@@ -51,9 +51,7 @@
 
 #lint-result .code-panel pre {
     margin-left: 40px;
-    font-size: 12px;
-    font-family: 'Courier New';
-    line-height: 18px;
+    font: 12px/1.5 "Courier New";
     background: #555;
     color: #fff;
     padding: 0 5px;
@@ -69,13 +67,13 @@
     height: 18px;
     list-style: none;
     font-size: 12px;
-    line-height: 18px;
+    line-height: 1.5;
     text-indent: 3px;
     position: relative;
     cursor: default;
 }
 
-#lint-result .info-tip li i {
+.info-tip li i {
     background: #fff;
     font-style: normal;
     display: none;
@@ -85,7 +83,7 @@
     width: 550px;
 }
 
-#lint-result .info-tip li:hover i {
+.info-tip li:hover i {
     display: block;
 }
 
@@ -99,5 +97,15 @@
 
 #special-form label {
     height: auto;
-    margin:15px auto;
+    margin: 15px auto;
+}
+
+.checkboxs label {
+    display: inline-block;
+}
+
+.checkboxs b {
+    display: inline-block;
+    width: 140px;
+    font-weight: 400;
 }
