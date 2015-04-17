@@ -96,3 +96,8 @@
 .info-tip .tip-error {
     background: #e63a3a;
 }
+
+#special-form label {
+    height: auto;
+    margin:15px auto;
+}

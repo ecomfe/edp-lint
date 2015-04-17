@@ -1,4 +1,8 @@
 define(function (require) {
+    function getSpecialForm() {
+        return document.getElementById('special-form');
+    }
+
     function getStartButton() {
         return document.getElementById('lint-start');
     }
@@ -10,10 +14,11 @@ define(function (require) {
     var resultTpl = ''
         + '<!-- for: ${data} as ${info}, ${index} -->'
         +   '<article><header><i data-cmd="switch-view" class="fa fa-code"></i>${info.path}</header><ul class="info-list">'
-        +   '<!-- for: ${info.messages} as ${msg} -->'
-        +     '<li><span class="label label-${msg.type}">${msg.type}</span>'
-        +     '<i class="label"><!-- if: ${msg.line} -->line: ${msg.line} col: ${msg.col}<!-- else -->common<!-- /if --></i>'
-        +     '${msg.message}</li>'
+        +   '<!-- for: ${info.errors} as ${msg} -->'
+        +     '<!-- var: type = ${msg.severity} === 1 ? "warning" : "error" -->'
+        +     '<li><span class="label label-${type}">${type}</span>'
+        +     '<i class="label"><!-- if: ${msg.line} -->line: ${msg.line} col: ${msg.column}<!-- else -->common<!-- /if --></i>'
+        +     '${msg.message}<b>${msg.rule}</b></li>'
         +   '<!-- /for -->'
         +   '</ul>'
         +   '<div class="code-panel" style="display:none">'
@@ -29,19 +34,32 @@ define(function (require) {
         + '<!-- /for -->';
     var resultRender = require('etpl').compile(resultTpl);
 
+    function getOptions() {
+        var form = getSpecialForm();
+        var cwd = require('partial/cwd').get();
+        var options = {cwd: cwd};
+
+        var name;
+        var value;
+        $.each($(form).serializeArray(), function (i, pair) {
+            name = pair.name;
+            value = pair.value;
+
+            options[name] = name in options ? options[name] + ',' + value : value;
+        });
+
+        return options;
+    }
 
     function startLint() {
-        var btn = this;
+        var btn = getStartButton();
         btn.disabled = true;
 
-        var cwd = require('partial/cwd').get();
 
         $.ajax({
             method: 'POST',
-            url: '/edp-lint/css',
-            data: {
-                cwd: cwd
-            },
+            url: '/edp-lint/check',
+            data: getOptions(),
             dataType: 'json',
             success: function (data) {
                 btn.disabled = false;
@@ -57,7 +75,7 @@ define(function (require) {
                     var tipRendered = {};
                     var tipLis = document.getElementById('code-info-tip-' + i)
                         .getElementsByTagName('li');
-                    var messages = data[i].messages;
+                    var messages = data[i].errors;
 
                     for (var j = 0, ml = messages.length; j < ml; j++) {
                         var info = messages[j];
@@ -66,7 +84,7 @@ define(function (require) {
                             if (!tipRendered[line]) {
                                 var lineNum = line - 1;
                                 var tipLi = tipLis[lineNum];
-                                tipLi.className = 'tip-' + info.type;
+                                tipLi.className = 'tip-' + (info.severity === 1 ? 'warning' : 'error');
                                 tipLi.innerHTML = line + '<i>' + info.message + '</i>';
                             }
 
@@ -76,6 +94,8 @@ define(function (require) {
                 }
             }
         });
+
+        return false;
     }
 
     function switchView(e) {
@@ -101,12 +121,12 @@ define(function (require) {
 
     return {
         load: function () {
-            getStartButton().onclick = startLint;
-            getResultPanel().onclick = switchView;
+            getSpecialForm().onsubmit = startLint;
+            getResultPanel().onclick  = switchView;
         },
 
         unload: function () {
-            getStartButton().onclick = null;
+            getSpecialForm().onclick = null;
             getResultPanel().onclick = null;
         }
     };

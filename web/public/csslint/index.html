@@ -1,7 +1,33 @@
 ---
-title: CSS代码检查
+title: 代码检查
 ---
 
-
-<button type="button" class="btn btn-primary" id="lint-start"><i class="fa fa-play"></i>开始检查当前目录</button>
+<form action="/edp-lint/lint" method="post" id="special-form">
+    <fieldset>
+        <legend>参数配置：</legend>
+        <label for="option-type">
+            <b>文件类型（可多选）</b>
+            <select id="option-type" name="type" size="4" multiple>
+                <option value="js" selected>JS</option>
+                <option value="css" selected>CSS</option>
+                <option value="less" selected>Less</option>
+                <option value="html" selected>HTML</option>
+            </select>
+        </label>
+        <label for="option-ignore">
+            <b>忽略检查文件模式</b>
+            <input type="text" id="option-ignore" name="ignore" placeholder="比如：*/**.m.{js,css}">
+        </label>
+        <label for="option-reporter">
+            <b>错误信息输出转换</b>
+            <select id="option-reporter" name="reporter" size="2">
+                <option value="" selected>默认（不区分错误等级）</option>
+                <option value="baidu">百度前端代码规范</option>
+            </select>
+        </label>
+    </fieldset>
+    <button type="submit" class="btn btn-primary" id="lint-start">
+        <i class="fa fa-play"></i>开始检查当前目录
+    </button>
+</form>
 <div id="lint-result"></div>
