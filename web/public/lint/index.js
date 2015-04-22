@@ -166,7 +166,7 @@ define(function (require) {
 
         unload: function () {
             cached = null;
-            getSpecialForm().onclick = null;
+            getSpecialForm().onsubmit = null;
             getResultPanel().onclick = null;
         }
     };
