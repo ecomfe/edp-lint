@@ -25,10 +25,14 @@
     }
   ],
   "dependencies": {
-    "fecs": "*"
+    "fecs": "*",
+    "snyk": "^1.31.0"
   },
   "repository": "git://github.com/ecomfe/edp-lint",
   "scripts": {
-    "test": "make -C test"
-  }
+    "test": "make -C test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
